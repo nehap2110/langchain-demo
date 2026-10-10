@@ -1,0 +1,13 @@
+LangChain is a framework for developing applications powered by language models.
+
+RAG stands for Retrieval Augmented Generation.
+
+RAG allows an application to retrieve relevant information from external documents before generating an answer.
+
+Embeddings convert text into numerical vectors.
+
+Vector stores are used to store embeddings and search for similar content.
+
+A retriever finds the most relevant documents for a user's question.
+
+JavaScript can be used to build complete GenAI applications using Node.js and LangChain.

@@ -2,6 +2,7 @@
   "name": "langchain-demo",
   "version": "1.0.0",
   "main": "index.js",
+  "type":"module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,10 +12,14 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^2.24.0",
+    "@huggingface/transformers": "^3.8.1",
+    "@langchain/classic": "^1.0.52",
+    "@langchain/community": "^1.1.29",
     "@langchain/core": "^1.2.13",
     "@langchain/google-genai": "^2.3.2",
     "@langchain/openai": "^1.6.0",
-    "dotenv": "^18.0.4",
+    "@langchain/textsplitters": "^1.0.2",
+    "dotenv": "^16.4.5",
     "langchain": "^1.5.14"
   }
 }
