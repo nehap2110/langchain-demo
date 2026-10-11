@@ -3,6 +3,9 @@ import {RecursiveCharacterTextSplitter} from "@langchain/textsplitters";
 import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers";
 import {MemoryVectorStore} from "@langchain/classic/vectorstores/memory";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
+import "dotenv/config";
+import { ChatGroq } from "@langchain/groq";
+import { RunnablePassthrough, RunnableLambda } from "@langchain/core/runnables";
 
 async function main(){
     const loader = new TextLoader('notes.txt');
@@ -27,35 +30,44 @@ async function main(){
     const vectorstore = await MemoryVectorStore.fromDocuments(chunks, embeddings);
 
     //ueser query
-    const query = "what is the main topic of the notes?";
+    const retriever = vectorstore.asRetriever({ k: 2 });
 
-    const retrieval = await vectorstore.asRetriever({
-        k:2
-    })
+     const prompt = ChatPromptTemplate.fromTemplate(`
+      Answer the question using only the context below.
+     If the answer is not in the context, say "I don't know".
 
-    const relevantchunks = await retrieval.invoke(query);
+        Context:
+       {context}
 
-    // relevantchunks.forEach((chunk,index)=>{
-    //     console.log(`\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n relevant chunk ${index} : ${chunk.pageContent}`);
-    // })
+        Question:
+       {question}
+      `);
 
-    // console.log(documents);
+     const model = new ChatGroq({
+      model: "openai/gpt-oss-20b",
+      temperature: 0,
+       });
 
-    const context = relevantchunks.map((chunk)=>chunk.pageContent).join("\n");
+        const ragChain = RunnablePassthrough.assign({
+         context: new RunnableLambda({
+       func: async ({ question }) => {
+       const docs = await retriever.invoke(question);
+       return docs.map((doc) => doc.pageContent).join("\n\n");
+         },
+         }),
+          })
+       .pipe(prompt)
+        .pipe(model);
 
-    const prompt = ChatPromptTemplate.fromTemplate(`
-        you are a helpful assistant .use the following context to answer the question at the end.
-        context :{context}
-        question :{question}
 
-        if the answer is not in the context,just say "i dont know".
-        `)
+        const query = "what is the main topic inside notes?"
+         const response = await ragChain.invoke({
+          question: query,
+         });
 
-        const formattedprompt = await prompt.invoke({
-            context,
-            question:query
-        });
+          console.log("\n--- RAG Chain Answer ---");
+             console.log(response.content);
 
-        console.log(formattedprompt);
+       // console.log(formattedprompt);
 }
 main();
