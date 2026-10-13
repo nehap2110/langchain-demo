@@ -21,6 +21,7 @@
     "@langchain/openai": "^1.6.0",
     "@langchain/textsplitters": "^1.0.2",
     "dotenv": "^16.6.1",
-    "langchain": "^1.5.14"
+    "langchain": "^1.5.14",
+    "pdf-parse": "^2.4.5"
   }
 }
